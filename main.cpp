@@ -95,7 +95,7 @@ int main() {
 
     cout << "\nXXXXXXX THE END OF THE PROGRAM XXXXXXX" << endl;
 
-    std::system("pause");
+    std::system("pause"); //Is used for VSCODE To pause the console. You may eliminate this.
 
     return 0;
 }
