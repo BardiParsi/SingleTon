@@ -10,6 +10,9 @@ This project demonstrates the implementation of the Singleton design pattern wit
 - **Expensive Task Simulation**: Includes a method `expensiveTask()` to simulate an expensive operation, showcasing real-world usage scenarios.
 - **Error Handling**: Proper error handling is implemented to handle invalid arguments and other exceptional situations.
 
+## Requirements
+- This project requires C++20 to compile and run successfully.
+
 ## Compilers
 This project is tested and compatible with the following compilers:
 - Mingw g++
