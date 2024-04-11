@@ -15,9 +15,11 @@ This project is tested and compatible with the following compilers:
 - Mingw g++
 - Microsoft Visual C++ (MSVC)
 
-## Compilers
+## License
 This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
 Feel free to use this content directly in your README.md file on GitHub.
+Author: Bardi (Masoud) Parsi
+Contact: farsi.masoud@gmail.com
 
 ## Usage
 
@@ -39,5 +41,10 @@ int main() {
 
     return 0;
 }
-
+´´´
+## License
+This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
+Feel free to use this content directly in your README.md file on GitHub.
+Author: Bardi (Masoud) Parsi
+Contact: farsi.masoud@gmail.com
 
