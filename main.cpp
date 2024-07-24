@@ -25,7 +25,10 @@ static std::once_flag initFlag;
 static std::mutex mtx;
 std::atomic<int32_t> x; //some task examples used in pretending an expensive task.
 SingleTon() = default;  //Constructor is inside the Private section for safe initialization
-
+static void cleanup() {
+        SingleTon* old = ptrObj.load(std::memory_order_acquire); // delete the ptr manually
+        delete old;
+    }
 public:
 static SingleTon* getInstance(){
     //making sure is the object is not initialized before starting the process
@@ -35,15 +38,16 @@ static SingleTon* getInstance(){
         temp = ptrObj.load(std::memory_order_relaxed);
         if (temp == nullptr) {
             std::call_once(initFlag, [&](){
-                temp = new SingleTon();
-                ptrObj.store(temp, std::memory_order_release);
+                SingleTon* newInstance = new SingleTon();
+                ptrObj.store(newInstance, std::memory_order_release);
             });
+            temp = ptrObj.load(std::memory_order_acquire);
         }
     }
     return temp; //May return nullptr
 }
 
-void expensiveTask(int32_t& x){
+void expensiveTask(const int32_t& x){
     //Check the error condition
     if (x <= 0)
     {
@@ -61,6 +65,11 @@ void expensiveTask(int32_t& x){
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
+static void destroyInstance() {
+        cleanup(); // Explicitly call cleanup method
+        ptrObj.store(nullptr, std::memory_order_release); // Reset pointer to nullptr
+    }
+
 ~SingleTon() = default;
 };
 
@@ -72,8 +81,8 @@ std::once_flag SingleTon::initFlag;
 int main() {
     assert(CPUThreadNum > 0);
     std::vector<std::jthread> vec; // vector of threads based on the performance of the user device
-
-    for (size_t i = 0; i < CPUThreadNum; i++) {
+    try{
+        for (size_t i = 0; i < CPUThreadNum; i++) {
         int32_t x = i + 1;
         SingleTon* singleObj = SingleTon::getInstance();
         assert(singleObj != nullptr);
@@ -85,16 +94,20 @@ int main() {
         {
             std::cerr << "\nThe value of X is not coresponded with CPU Thread numbers. " << e.what() << '\n';
         }
-
-
-    }
-
-    for(auto& thread : vec){
+        }
+        for(auto& thread : vec){
         thread.join();
+        }
+        // Cleanup at the end of the program
+        SingleTon::destroyInstance();
+        cout << "\nXXXXXXX THE END OF THE PROGRAM XXXXXXX" << endl;
     }
-
-    cout << "\nXXXXXXX THE END OF THE PROGRAM XXXXXXX" << endl;
-
+    catch(const std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+        // Ensure proper cleanup in case of exception
+        SingleTon::destroyInstance();
+    }
+    
     std::system("pause"); //Is used for VSCODE To pause the console. You may eliminate this.
 
     return 0;
